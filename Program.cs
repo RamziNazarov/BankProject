@@ -61,6 +61,12 @@ namespace ProjectAlif
                                             System.Console.WriteLine("eror");
                                         }
                                     break;
+                                    case "2":
+                                        admin.SelectAllApplications();
+                                    break;
+                                    case "3":
+                                        admin.SelectAllApplicationsFromSerP("a 12345679");
+                                    break;
                                 }
                             }
                             else
@@ -83,6 +89,12 @@ namespace ProjectAlif
                                         Console.Clear();
                                         Application application = new Application(customer);
                                         application.SendApp();
+                                    break;
+                                    case "2":
+                                        Console.Clear();
+                                        Application application1 = new Application(customer);
+                                        application1.ShowApplicationWithSerP();
+                                        Console.ReadKey();
                                     break;
                                 }
                             }

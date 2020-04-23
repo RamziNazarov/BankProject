@@ -9,6 +9,36 @@ namespace ProjectAlif
         int log {get;set;}
         string pas{get;set;}
         SqlConnection connection = new SqlConnection(Constr.connectionString);
+        public void SelectAllApplications()
+        {
+            if(connection.State == ConnectionState.Closed)
+                connection.Open();
+            string comstr = $"select LastName,FirstName,Aim,Salary,CreditSumm,Term,[Status] from Applications join Customer on Customer.SerP = Applications.SerP";
+            SqlCommand command = new SqlCommand(comstr,connection);
+            System.Console.WriteLine($"Фамилия | Имя | Цель | Общий доход | Сумма кредита | Срок | Статус");
+            using(SqlDataReader reader = command.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    System.Console.WriteLine($"{reader.GetValue(0).ToString()} | {reader.GetValue(1).ToString()} | {reader.GetValue(2).ToString()} | {reader.GetValue(3).ToString()} | {reader.GetValue(4).ToString()} | {reader.GetValue(5).ToString()} | {reader.GetValue(6).ToString()}");
+                }
+            }
+        }
+        public void SelectAllApplicationsFromSerP(string SerP)
+        {
+            if(connection.State == ConnectionState.Closed)
+                connection.Open();
+            string comstr = $"select LastName,FirstName,Aim,Salary,CreditSumm,Term,[Status] from Applications join Customer on Customer.SerP = Applications.SerP where Applications.Serp = '{SerP}'";
+            SqlCommand command = new SqlCommand(comstr,connection);
+            System.Console.WriteLine($"Фамилия | Имя | Цель | Общий доход | Сумма кредита | Срок | Статус");
+            using(SqlDataReader reader = command.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    System.Console.WriteLine($"{reader.GetValue(0).ToString()} | {reader.GetValue(1).ToString()} | {reader.GetValue(2).ToString()} | {reader.GetValue(3).ToString()} | {reader.GetValue(4).ToString()} | {reader.GetValue(5).ToString()} | {reader.GetValue(6).ToString()}");
+                }
+            }
+        }
         public int AddAdmin()
         {
             System.Console.Write("Введите логин: ");
