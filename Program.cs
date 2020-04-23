@@ -6,7 +6,7 @@ namespace ProjectAlif
     {
         static void Main(string[] args)
         {
-            System.Console.WriteLine(int.Parse(DateTime.Now.ToString().Substring(6,4)));
+            System.Console.WriteLine(int.Parse(DateTime.Now.ToString().Substring(6, 4)));
             Customer customer;
             Admin admin;
             string choise = "";
@@ -14,14 +14,14 @@ namespace ProjectAlif
             int result = 0;
             System.Console.Write("1. Авторизация\n2. Вход\nВыбор: ");
             choise = Console.ReadLine();
-            switch(choise)
+            switch (choise)
             {
-                
+
                 case "1":
                     Console.Clear();
                     customer = new Customer();
                     result = customer.AddCustomer();
-                    if(result >= 1)
+                    if (result >= 1)
                     {
                         System.Console.WriteLine("Welcome!");
                         goto come;
@@ -30,29 +30,29 @@ namespace ProjectAlif
                     {
                         System.Console.WriteLine("eror");
                     }
-                break;
+                    break;
                 case "2":
-                    come:
+                come:
                     Console.Clear();
                     System.Console.Write("1. Войти как админ\n2. Войти как клиент\nВыбор: ");
                     choise = Console.ReadLine();
-                    switch(choise)
+                    switch (choise)
                     {
                         case "1":
-                        Console.Clear();
+                            Console.Clear();
                             System.Console.WriteLine("Войти как админ");
                             admin = new Admin();
                             res = admin.FindAdmin();
-                            if(res)
+                            if (res)
                             {
                                 Console.Clear();
                                 System.Console.WriteLine("1. Добавить админа: ");
                                 choise = Console.ReadLine();
-                                switch(choise)
+                                switch (choise)
                                 {
                                     case "1":
                                         result = admin.AddAdmin();
-                                        if(result >= 1)
+                                        if (result >= 1)
                                         {
                                             System.Console.WriteLine("successfully");
                                         }
@@ -60,32 +60,32 @@ namespace ProjectAlif
                                         {
                                             System.Console.WriteLine("eror");
                                         }
-                                    break;
+                                        break;
                                     case "2":
                                         admin.SelectAllApplications();
-                                    break;
+                                        break;
                                     case "3":
                                         admin.SelectAllApplicationsFromSerP("a 12345679");
-                                    break;
+                                        break;
                                 }
                             }
                             else
                             {
                                 System.Console.WriteLine("eror");
                             }
-                        break;
+                            break;
                         case "2":
-                        Console.Clear();
+                            Console.Clear();
                             customer = new Customer();
                             res = customer.FindCustomer();
-                            if(res)
+                            if (res)
                             {
-                                menu:
+                            menu:
                                 Console.Clear();
                                 System.Console.WriteLine($"Доброе пожаловать {customer.firstName} {customer.lastName}!");
                                 System.Console.Write("1. Оставить заявку на кредит\n2. Посмотреть историю заявок\n3. Посмотреть данные\n4. Посмотреть кредитную историю\n5. Посмотреть график погашения\n6. Оплатить\nВыбор: ");
                                 choise = Console.ReadLine();
-                                switch(choise)
+                                switch (choise)
                                 {
                                     case "1":
                                         Console.Clear();
@@ -107,7 +107,13 @@ namespace ProjectAlif
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
-                                        case "5":
+                                    case "4":
+                                        Console.Clear();
+                                        customer.ShowCreditWithSerP();
+                                        System.Console.Write("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto menu;
+                                    case "5":
                                         Console.Clear();
                                         customer.ShowGraphicWithSerP();
                                         System.Console.Write("Press any key to turn back...");
@@ -119,9 +125,9 @@ namespace ProjectAlif
                             {
                                 System.Console.WriteLine("eror");
                             }
-                        break;
+                            break;
                     }
-                break;
+                    break;
             }
             Console.ReadKey();
         }

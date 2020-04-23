@@ -89,6 +89,7 @@ namespace ProjectAlif
                 while(reader.Read())
                 {
                     System.Console.WriteLine($"Фамилия: {reader.GetValue(0).ToString()}\nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nДоход: {reader.GetValue(3).ToString()} \nСумма кредита: {reader.GetValue(4).ToString()} \nСрок: {reader.GetValue(5).ToString()} \nСтатус: {reader.GetValue(6).ToString()} ");
+                    System.Console.WriteLine("---------------------------------");
                 }
             }
         }
