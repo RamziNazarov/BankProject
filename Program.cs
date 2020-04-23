@@ -121,6 +121,12 @@ namespace ProjectAlif
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
+                                        case "6":
+                                        Console.Clear();
+                                        customer.Pay();
+                                        System.Console.Write("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto menu;
                                 }
                             }
                             else
