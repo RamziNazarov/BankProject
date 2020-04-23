@@ -104,5 +104,35 @@ namespace ProjectAlif
             }
             return false;
         }
+        public void ShowInfoWithSerp()
+        {
+            if(connection.State == ConnectionState.Closed)
+                connection.Open();
+            SqlCommand command = new SqlCommand("Select * from Customer where SerP = '"+SerP+"'",connection);
+            using(SqlDataReader reader = command.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    System.Console.WriteLine($"Серия паспорат: {reader.GetValue(0).ToString()}\nЛогин: {reader.GetValue(1).ToString()}\nПароль: {reader.GetValue(2).ToString()}\nДата рожения: {reader.GetValue(3).ToString().Substring(0,10)}\nПол: {reader.GetValue(4).ToString()}\nСемейное положение: {reader.GetValue(5).ToString()}\nГражданство: {reader.GetValue(6).ToString()}\nИмя: {reader.GetValue(7).ToString()}\nФамилия: {reader.GetValue(8).ToString()}");
+                }
+            }
+        }
+        public void ShowGraphicWithSerP()
+        {
+            if(connection.State == ConnectionState.Closed)
+                connection.Open();
+            System.Console.WriteLine("Фамилия | Имя | Сумма | До даты | Оплачено | Дата оплаты | Просрочка ");
+            SqlCommand command = new SqlCommand($"select LastName,FirstName,SummForPay,DateForPay,PaySumm,PayDate,Pros from Graphic join Customer on Customer.SerP = Applications.SerP where Applications.Serp = '{SerP}'",connection);
+            using(SqlDataReader reader = command.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    if(reader.GetValue(5).ToString().ToLower() != "null")
+                    System.Console.WriteLine($"{reader.GetValue(0).ToString()} | {reader.GetValue(1).ToString()} | {reader.GetValue(2).ToString()} | {reader.GetValue(3).ToString().Substring(0,10)} | {reader.GetValue(4).ToString()} | {reader.GetValue(5).ToString().Substring(0,10)} | {reader.GetValue(6).ToString()}");
+                    else
+                    System.Console.WriteLine($"{reader.GetValue(0).ToString()} | {reader.GetValue(1).ToString()} | {reader.GetValue(2).ToString()} | {reader.GetValue(3).ToString().Substring(0,10)} | {reader.GetValue(4).ToString()} | Нет | {reader.GetValue(6).ToString()}");
+                }
+            }
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace ProjectAlif
             bool a = Calculator.Calculate(customer,Aim,Salary,CreditSumm);
             if(a == false)
             {
-                comstr = $"insert into Applications([Aim],[Salary],[CreditSumm],[Term],[Status],[SerP]) values ('{Aim}',{Salary},{CreditSumm},{Term},'{a}','{customer.GetSerP()}')";
+                comstr = $"insert into Applications([Aim],[Salary],[CreditSumm],[Term],[Status],[SerP]) values ('{Aim}',{Salary},{CreditSumm},{Term},'Отказано','{customer.GetSerP()}')";
                 using (SqlCommand command = new SqlCommand(comstr, connection))
                 {
                     command.ExecuteNonQuery();
@@ -45,35 +45,23 @@ namespace ProjectAlif
             }
             else
             {
-                comstr = $"insert into Applications([Aim],[Salary],[CreditSumm],[Term],[Status],[SerP]) values ('{Aim}',{Salary},{CreditSumm},{Term},'{a}','{customer.GetSerP()}')";
+                comstr = $"insert into Applications([Aim],[Salary],[CreditSumm],[Term],[Status],[SerP]) values ('{Aim}',{Salary},{CreditSumm},{Term},'Одобрено','{customer.GetSerP()}')";
                 using (SqlCommand command = new SqlCommand(comstr, connection))
                 {
                     command.ExecuteNonQuery();
                 }
-                // for (int i = 0; i < Term; i++)
-                // {
-                    
-                //     // string constr = $"insert into Graphic([SerP],[SummForPay],[DateForPay])";
-                //     // using (SqlCommand command = new SqlCommand(constr, connection))
-                //     // {
-                //     //     command.ExecuteNonQuery();
-                //     // }
-                    
-                // }
                 AddGraphic();
-                comstr = $"insert into Credit([Aim],[CreditSumm],[Term],[Pros],[StartDate],[EndDate],[Status],[Ostatok],[SerP],[SummWithProcent]) values ('{Aim}',{CreditSumm},{Term},0,'{DateTime.Now.ToString().Substring(0,10)}',null,'Open',{CreditSumm * 0.2},'{customer.GetSerP()}',{CreditSumm + CreditSumm * 0.2})";
-                using( SqlCommand command = new SqlCommand(comstr, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
+                AddCredit();
+                System.Console.WriteLine("Одобрено!");
+                return 1;
             }
-            return 1;
         }
         public void AddCredit()
         {
             if(connection.State == ConnectionState.Closed)
                 connection.Open();
-            SqlCommand command = new SqlCommand($"",connection);
+                string scomstr = $"insert into Credit([Aim],[CreditSumm],[Term],[Pros],[StartDate],[EndDate],[Status],[Ostatok],[SerP],[SummWithProcent]) values ('{Aim}',{CreditSumm},{Term},0,'{DateTime.Now.ToString().Substring(0,10)}',null,'Открыт',{CreditSumm+CreditSumm * 0.2},'{customer.GetSerP()}',{CreditSumm + CreditSumm * 0.2})";
+            SqlCommand command = new SqlCommand(scomstr,connection);
             command.ExecuteNonQuery();
         }
         public void AddGraphic()
@@ -86,14 +74,13 @@ namespace ProjectAlif
                 if(connection.State == ConnectionState.Closed)
                     connection.Open();
                 string datefor = date.ToString().Substring(0,10);
-                SqlCommand command = new SqlCommand($"insert into Graphic([SerP],[SummForPay],[DateForPay],[Pros],[PaySumm],[PayDate]) values ('{customer.SerP}', '{Math.Round(paysumm,5)}' ,'{datefor}', '0', '0',null)",connection);
+                SqlCommand command = new SqlCommand($"insert into Graphic([SerP],[SummForPay],[DateForPay],[Pros],[PaySumm],[PayDate]) values ('{customer.SerP}', '{Math.Round(paysumm,0)}' ,'{datefor}', '0', '0',null)",connection);
                 command.ExecuteNonQuery();
                 date = date.AddMonths(1);
             }
         }
         public void ShowApplicationWithSerP()
         {
-            System.Console.WriteLine($"Фамилия | Имя | Цель | Доход | Сумма кредита | Срок | Статус ");
             if(connection.State == ConnectionState.Closed)
                 connection.Open();
             SqlCommand com = new SqlCommand("select LastName,FirstName,Aim,Salary,CreditSumm,Term,Status from Applications join Customer on Customer.SerP = Applications.SerP where Applications.SerP = '"+customer.SerP+"'",connection);
@@ -101,7 +88,7 @@ namespace ProjectAlif
             {
                 while(reader.Read())
                 {
-                    System.Console.WriteLine($"{reader.GetValue(0).ToString()} | {reader.GetValue(1).ToString()} | {reader.GetValue(2).ToString()} | {reader.GetValue(3).ToString()} | {reader.GetValue(4).ToString()} | {reader.GetValue(5).ToString()} | {reader.GetValue(6).ToString()} ");
+                    System.Console.WriteLine($"Фамилия: {reader.GetValue(0).ToString()}\nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nДоход: {reader.GetValue(3).ToString()} \nСумма кредита: {reader.GetValue(4).ToString()} \nСрок: {reader.GetValue(5).ToString()} \nСтатус: {reader.GetValue(6).ToString()} ");
                 }
             }
         }

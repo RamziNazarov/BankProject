@@ -80,8 +80,10 @@ namespace ProjectAlif
                             res = customer.FindCustomer();
                             if(res)
                             {
+                                menu:
+                                Console.Clear();
                                 System.Console.WriteLine($"Доброе пожаловать {customer.firstName} {customer.lastName}!");
-                                System.Console.Write("1. Оставить заявку на кредит\n2. Посмотреть историю заявок\n3. Изменить данные\n4. Посмотреть кредитную историю\n5. Посмотреть график погашения\n6. Оплатить\n7. Посмотреть данные\nВыбор: ");
+                                System.Console.Write("1. Оставить заявку на кредит\n2. Посмотреть историю заявок\n3. Посмотреть данные\n4. Посмотреть кредитную историю\n5. Посмотреть график погашения\n6. Оплатить\nВыбор: ");
                                 choise = Console.ReadLine();
                                 switch(choise)
                                 {
@@ -89,13 +91,28 @@ namespace ProjectAlif
                                         Console.Clear();
                                         Application application = new Application(customer);
                                         application.SendApp();
-                                    break;
+                                        System.Console.Write("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto menu;
                                     case "2":
                                         Console.Clear();
                                         Application application1 = new Application(customer);
                                         application1.ShowApplicationWithSerP();
+                                        System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
-                                    break;
+                                        goto menu;
+                                    case "3":
+                                        Console.Clear();
+                                        customer.ShowInfoWithSerp();
+                                        System.Console.Write("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto menu;
+                                        case "5":
+                                        Console.Clear();
+                                        customer.ShowGraphicWithSerP();
+                                        System.Console.Write("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto menu;
                                 }
                             }
                             else

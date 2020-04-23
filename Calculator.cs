@@ -28,7 +28,7 @@ namespace ProjectAlif
                 {
                     while(reader.Read())
                     {
-                        if(reader.GetValue(6).ToString() == "Open")
+                        if(reader.GetValue(6).ToString() == "Открыт")
                         {
                             return false;
                         }
