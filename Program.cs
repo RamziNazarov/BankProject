@@ -89,15 +89,17 @@ namespace ProjectAlif
                                 {
                                     case "1":
                                         Console.Clear();
-                                        Application application = new Application(customer);
-                                        application.SendApp();
+                                        customer.SendApp();
+                                        // Application application = new Application(customer);
+                                        // application.SendApp();
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
                                     case "2":
                                         Console.Clear();
-                                        Application application1 = new Application(customer);
-                                        application1.ShowApplicationWithSerP();
+                                        customer.ShowApplicationWithSerP();
+                                        // Application application1 = new Application(customer);
+                                        // application1.ShowApplicationWithSerP();
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
