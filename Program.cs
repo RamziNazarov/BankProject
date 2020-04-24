@@ -6,6 +6,8 @@ namespace ProjectAlif
     {
         static void Main(string[] args)
         {
+        start:
+        Console.Clear();
             Customer customer;
             Admin admin;
             System.Console.Write("1. Авторизация\n2. Вход\nВыбор: ");
@@ -13,11 +15,12 @@ namespace ProjectAlif
             {
 
                 case "1":
-                    regagain:
+                regagain:
                     Console.Clear();
                     customer = new Customer();
                     if (customer.AddCustomer() >= 1)
                     {
+                        Console.Clear();
                         System.Console.WriteLine("Вы успешно зарегистрировались.");
                         System.Console.WriteLine("Press any key to log in...");
                         Console.ReadKey();
@@ -25,6 +28,7 @@ namespace ProjectAlif
                     }
                     else
                     {
+                        Console.Clear();
                         System.Console.WriteLine("Клиент с таким логином или серией паспорта существует!");
                         System.Console.WriteLine("Press any key to reg again...");
                         Console.ReadKey();
@@ -37,14 +41,14 @@ namespace ProjectAlif
                     switch (Console.ReadLine())
                     {
                         case "1":
-                            secondchance:
+                        secondchance:
                             Console.Clear();
                             admin = new Admin();
                             if (admin.FindAdmin())
                             {
                             adminmenu:
                                 Console.Clear();
-                                System.Console.WriteLine("1. Добавить админа\n2. Посмотреть все заявки\n3. Посмотреть заявки одного клиента\n4. Посмотреть график погашения всех клиентов\n5. Посмотреть график погашения одного клиента\n6. ");
+                                System.Console.WriteLine("1. Добавить админа\n2. Посмотреть все заявки\n3. Посмотреть заявки одного клиента\n4. Посмотреть график погашения всех клиентов\n5. Посмотреть график погашения одного клиента\n6. Посмотреть историю кредитов всех клиентов\n7. Посмотреть историю кредитов одного клиента");
                                 switch (Console.ReadLine())
                                 {
                                     case "1":
@@ -90,6 +94,21 @@ namespace ProjectAlif
                                         System.Console.WriteLine("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto adminmenu;
+                                    case "6":
+                                        Console.Clear();
+                                        admin.ShowCreditHistory();
+                                        System.Console.WriteLine("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto adminmenu;
+                                    case "7":
+                                        Console.Clear();
+                                        System.Console.Write("Введите серию паспорта или номер(логин): ");
+                                        admin.ShowCreditHistory(Console.ReadLine());
+                                        System.Console.WriteLine("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto adminmenu;
+                                    default:
+                                        goto adminmenu;
                                 }
                             }
                             else
@@ -97,9 +116,8 @@ namespace ProjectAlif
                                 System.Console.WriteLine("Неправильный логин или пароль!");
                                 goto secondchance;
                             }
-                            break;
                         case "2":
-                            chance:
+                        chance:
                             Console.Clear();
                             customer = new Customer();
                             if (customer.FindCustomer())
@@ -146,15 +164,20 @@ namespace ProjectAlif
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
+                                    default:
+                                        goto menu;
                                 }
                             }
                             else
                             {
                                 System.Console.WriteLine("Неправильный логин или пароль!");
+                                Console.ReadKey();
                             }
                             goto chance;
                     }
                     break;
+                default:
+                    goto start;
             }
             Console.ReadKey();
         }
