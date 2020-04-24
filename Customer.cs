@@ -56,7 +56,7 @@ namespace ProjectAlif
             this.maritalStatus = (mar == "1") ? "Холост" : (mar == "2") ? "Семянин" : (mar == "3") ? "В разводе" : (mar == "4") ? "Вдова/Вдовец" : "Er";
             if (maritalStatus == "Er") goto maritalStatus;
             System.Console.Write("Выберите ваше гражданство\n1. Таджикистан\n2. Другое\nВыбор: ");
-            this.nation = (Console.ReadLine().ToLower() == "таджикистан") ? "Таджикистан" : "Зарубеж";
+            this.nation = (Console.ReadLine().ToLower() == "1") ? "Таджикистан" : "Зарубеж";
             System.Console.Write("Введите имя: ");
             this.firstName = Console.ReadLine();
             System.Console.Write("Введите фамилию: ");
