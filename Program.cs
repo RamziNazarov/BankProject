@@ -5,7 +5,7 @@ namespace ProjectAlif
     class Program
     {
         static void Main(string[] args)
-        {
+        {   
         start:
         Console.Clear();
             Customer customer;

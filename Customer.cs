@@ -28,12 +28,21 @@ namespace ProjectAlif
         SqlConnection connection = new SqlConnection(Constr.connectionString);
         public int AddCustomer()
         {
+        serP:
+            Console.Clear();
             System.Console.Write("Введите серию паспорта: ");
             this.SerP = Console.ReadLine();
+            if (SerP.Length < 8) goto serP;
+            log:
+            Console.Clear();
             System.Console.Write("Введите номер телефона(логин): ");
             this.log = int.Parse(Console.ReadLine());
+            if (log.ToString().Length < 9) goto log;
+            pas:
+            Console.Clear();
             System.Console.Write("Введите пароль: ");
             this.pas = Console.ReadLine();
+            if (pas.Length < 4) goto pas;
             System.Console.Write("Введите дату рождения(дд.мм.гггг): ");
             this.birthDate = Console.ReadLine();
         gen:
@@ -46,7 +55,7 @@ namespace ProjectAlif
             string mar = Console.ReadLine();
             this.maritalStatus = (mar == "1") ? "Холост" : (mar == "2") ? "Семянин" : (mar == "3") ? "В разводе" : (mar == "4") ? "Вдова/Вдовец" : "Er";
             if (maritalStatus == "Er") goto maritalStatus;
-            System.Console.Write("Введите ваше гражданство: ");
+            System.Console.Write("Выберите ваше гражданство\n1. Таджикистан\n2. Другое\nВыбор: ");
             this.nation = (Console.ReadLine().ToLower() == "таджикистан") ? "Таджикистан" : "Зарубеж";
             System.Console.Write("Введите имя: ");
             this.firstName = Console.ReadLine();
@@ -147,7 +156,7 @@ namespace ProjectAlif
                     }
                 }
             }
-            if(a == 0)
+            if (a == 0)
             {
                 System.Console.WriteLine("У вас нет открытых кредитов!");
             }
@@ -158,24 +167,24 @@ namespace ProjectAlif
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
             SqlCommand command = new SqlCommand($"select LastName,FirstName,Aim,CreditSumm,Term,Pros,StartDate,EndDate,Status,Ostatok,SummWithProcent from Credit join Customer on Customer.SerP = Credit.SerP where Credit.Serp = '{SerP}'", connection);
-            using(SqlDataReader reader = command.ExecuteReader())
+            using (SqlDataReader reader = command.ExecuteReader())
             {
-                while(reader.Read())
+                while (reader.Read())
                 {
                     a++;
-                    if(reader.GetValue(7).ToString() == "")
+                    if (reader.GetValue(7).ToString() == "")
                     {
-                        System.Console.WriteLine($"{a} Кредит\nФамилия: {reader.GetValue(0).ToString()} \nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nСумма кредита: {reader.GetValue(3).ToString()} \nСрок: {reader.GetValue(4).ToString()} \nПросрочка: {reader.GetValue(5).ToString()} \nДата открытия: {reader.GetValue(6).ToString().Substring(0,10)}\nДата закрытия: Еще не закрыт\nСтатус: {reader.GetValue(8).ToString()}\nОстаток: {reader.GetValue(9).ToString()}\nСумма оплаты: {reader.GetValue(10).ToString()}");
+                        System.Console.WriteLine($"{a} Кредит\nФамилия: {reader.GetValue(0).ToString()} \nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nСумма кредита: {reader.GetValue(3).ToString()} \nСрок: {reader.GetValue(4).ToString()} \nПросрочка: {reader.GetValue(5).ToString()} \nДата открытия: {reader.GetValue(6).ToString().Substring(0, 10)}\nДата закрытия: Еще не закрыт\nСтатус: {reader.GetValue(8).ToString()}\nОстаток: {reader.GetValue(9).ToString()}\nСумма оплаты: {reader.GetValue(10).ToString()}");
                         System.Console.WriteLine("------------------------------------");
                     }
                     else
                     {
-                        System.Console.WriteLine($"{a} Кредит\nФамилия: {reader.GetValue(0).ToString()} \nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nСумма кредита: {reader.GetValue(3).ToString()} \nСрок: {reader.GetValue(4).ToString()} \nПросрочка: {reader.GetValue(5).ToString()} \nДата открытия: {reader.GetValue(6).ToString().Substring(0,10)}\nДата закрытия: {reader.GetValue(7).ToString().Substring(0,10)}\nСтатус: {reader.GetValue(8).ToString()}\nОстаток: {reader.GetValue(9).ToString()}\nСумма оплаты: {reader.GetValue(10).ToString()}");
+                        System.Console.WriteLine($"{a} Кредит\nФамилия: {reader.GetValue(0).ToString()} \nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nСумма кредита: {reader.GetValue(3).ToString()} \nСрок: {reader.GetValue(4).ToString()} \nПросрочка: {reader.GetValue(5).ToString()} \nДата открытия: {reader.GetValue(6).ToString().Substring(0, 10)}\nДата закрытия: {reader.GetValue(7).ToString().Substring(0, 10)}\nСтатус: {reader.GetValue(8).ToString()}\nОстаток: {reader.GetValue(9).ToString()}\nСумма оплаты: {reader.GetValue(10).ToString()}");
                         System.Console.WriteLine("------------------------------------");
                     }
                 }
             }
-            if(a == 0)
+            if (a == 0)
             {
                 System.Console.WriteLine("У вас нет кредитной истории!");
             }
@@ -194,8 +203,8 @@ namespace ProjectAlif
             Term = int.Parse(Console.ReadLine());
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
-            bool a = Calculator.Calculate(this,Aim,Salary,CreditSumm);
-            if(a == false)
+            bool a = Calculator.Calculate(this, Aim, Salary, CreditSumm);
+            if (a == false)
             {
                 comstr = $"insert into Applications([Aim],[Salary],[CreditSumm],[Term],[Status],[SerP]) values ('{Aim}',{Salary},{CreditSumm},{Term},'Отказано','{SerP}')";
                 using (SqlCommand command = new SqlCommand(comstr, connection))
@@ -218,10 +227,10 @@ namespace ProjectAlif
         }
         public void AddCredit()
         {
-            if(connection.State == ConnectionState.Closed)
+            if (connection.State == ConnectionState.Closed)
                 connection.Open();
-                string scomstr = $"insert into Credit([Aim],[CreditSumm],[Term],[Pros],[StartDate],[EndDate],[Status],[Ostatok],[SerP],[SummWithProcent]) values ('{Aim}',{CreditSumm},{Term},0,'{DateTime.Now.ToString().Substring(0,10)}',null,'Открыт',{CreditSumm+CreditSumm * 0.2},'{SerP}',{CreditSumm + CreditSumm * 0.2})";
-            SqlCommand command = new SqlCommand(scomstr,connection);
+            string scomstr = $"insert into Credit([Aim],[CreditSumm],[Term],[Pros],[StartDate],[EndDate],[Status],[Ostatok],[SerP],[SummWithProcent]) values ('{Aim}',{CreditSumm},{Term},0,'{DateTime.Now.ToString().Substring(0, 10)}',null,'Открыт',{CreditSumm + CreditSumm * 0.2},'{SerP}',{CreditSumm + CreditSumm * 0.2})";
+            SqlCommand command = new SqlCommand(scomstr, connection);
             command.ExecuteNonQuery();
         }
         public void AddGraphic()
@@ -229,32 +238,32 @@ namespace ProjectAlif
             DateTime date = DateTime.Now;
             date = date.AddMonths(1);
             double paysumm = (CreditSumm + (CreditSumm * 0.2)) / Term;
-            for(int i = 0; i < Term;i++)
+            for (int i = 0; i < Term; i++)
             {
-                if(connection.State == ConnectionState.Closed)
+                if (connection.State == ConnectionState.Closed)
                     connection.Open();
-                string datefor = date.ToString().Substring(0,10);
-                SqlCommand command = new SqlCommand($"insert into Graphic([SerP],[SummForPay],[DateForPay],[Pros],[PaySumm],[PayDate]) values ('{SerP}', '{Math.Round(paysumm,0)}' ,'{datefor}', '0', '0',null)",connection);
+                string datefor = date.ToString().Substring(0, 10);
+                SqlCommand command = new SqlCommand($"insert into Graphic([SerP],[SummForPay],[DateForPay],[Pros],[PaySumm],[PayDate]) values ('{SerP}', '{Math.Round(paysumm, 0)}' ,'{datefor}', '0', '0',null)", connection);
                 command.ExecuteNonQuery();
                 date = date.AddMonths(1);
             }
         }
         public void ShowApplicationWithSerP()
         {
-            if(connection.State == ConnectionState.Closed)
+            if (connection.State == ConnectionState.Closed)
                 connection.Open();
-            SqlCommand com = new SqlCommand("select LastName,FirstName,Aim,Salary,CreditSumm,Term,Status from Applications join Customer on Customer.SerP = Applications.SerP where Applications.SerP = '"+SerP+"'",connection);
-            int a =0;
-            using(SqlDataReader reader = com.ExecuteReader())
+            SqlCommand com = new SqlCommand("select LastName,FirstName,Aim,Salary,CreditSumm,Term,Status from Applications join Customer on Customer.SerP = Applications.SerP where Applications.SerP = '" + SerP + "'", connection);
+            int a = 0;
+            using (SqlDataReader reader = com.ExecuteReader())
             {
-                while(reader.Read())
+                while (reader.Read())
                 {
                     a++;
                     System.Console.WriteLine($"{a} Заявка\nФамилия: {reader.GetValue(0).ToString()}\nИмя: {reader.GetValue(1).ToString()} \nЦель: {reader.GetValue(2).ToString()} \nДоход: {reader.GetValue(3).ToString()} \nСумма кредита: {reader.GetValue(4).ToString()} \nСрок: {reader.GetValue(5).ToString()} \nСтатус: {reader.GetValue(6).ToString()} ");
                     System.Console.WriteLine("---------------------------------");
                 }
             }
-            if(a == 0)
+            if (a == 0)
             {
                 System.Console.WriteLine("У вас нет запросов!");
             }
@@ -265,71 +274,197 @@ namespace ProjectAlif
             double summa = double.Parse(Console.ReadLine());
             System.Console.Write("Введите дату(дд.мм.гггг): ");
             string date = Console.ReadLine();
-            int dd = int.Parse(date.Substring(0,2));
-            int mm = int.Parse(date.Substring(3,2));
-            int yy = int.Parse(date.Substring(6,4));
-            double vsyasumma = 0;
-            if(connection.State == ConnectionState.Closed)
+            int dd = int.Parse(date.Substring(0, 2));
+            int mm = int.Parse(date.Substring(3, 2));
+            int yy = int.Parse(date.Substring(6, 4));
+            //double vsyasumma = 0;
+            if (connection.State == ConnectionState.Closed)
                 connection.Open();
             List<int> arraymonth = new List<int>();
             List<int> arrayyear = new List<int>();
             List<int> arrayday = new List<int>();
             List<double> arraysumsforpay = new List<double>();
             List<double> arrayoplsumms = new List<double>();
-            SqlCommand command = new SqlCommand($"select * from Graphic where SerP = '{SerP}'",connection);
-            using(SqlDataReader reader = command.ExecuteReader())
+            SqlCommand command = new SqlCommand($"select * from Graphic where SerP = '{SerP}'", connection);
+            using (SqlDataReader reader = command.ExecuteReader())
             {
-                while(reader.Read())
+                while (reader.Read())
                 {
-                    // int month = int.Parse(reader.GetValue(2).ToString().Substring(3,2));
-                    arraymonth.Add(int.Parse(reader.GetValue(2).ToString().Substring(3,2)));
-                    // int year
-                    arrayyear.Add(int.Parse(reader.GetValue(2).ToString().Substring(6,4)));
-                    // int day = 
-                    arrayday.Add(int.Parse(reader.GetValue(2).ToString().Substring(0,2)));
-                    // double summforpay = 
+                    arraymonth.Add(int.Parse(reader.GetValue(2).ToString().Substring(3, 2)));
+                    arrayyear.Add(int.Parse(reader.GetValue(2).ToString().Substring(6, 4)));
+                    arrayday.Add(int.Parse(reader.GetValue(2).ToString().Substring(0, 2)));
                     arraysumsforpay.Add(double.Parse(reader.GetValue(1).ToString()));
-                    //vsyasumma+=summforpay;
-                    //double a =0;
-                    // double oplsumm = 
                     arrayoplsumms.Add(double.Parse(reader.GetValue(3).ToString()));
-                    
-                    // if(double.Parse(reader.GetValue(1).ToString()) < double.Parse(reader.GetValue(3).ToString()))
-                    // {
-                    //     string datefor = reader.GetValue(2).ToString().Substring(0,10);
-                    //     if(int.Parse(datefor.Substring(3,2)) > int.Parse(date.Substring(3,2)))
-                    //     {
-                    //         // SqlCommand command1 = new SqlCommand($"update Graphic set PaySumm = {summa},Pros = {1}",connection);
-                    //         // command1.ExecuteNonQuery();
-                    //     }
-                    //     if(double.Parse(reader.GetValue(3).ToString()) < summa)
-                    //     {
-
-                    //     }
-                    //     SqlCommand com = new SqlCommand($"update Graphic set PaySumm = '{Math.Round(summa,5)}', PayDat = '{date}'",connection);
-                    //     com.ExecuteNonQuery();
-                    // }
                 }
             }
-            // if(oplsumm < summforpay)
-            //         {
-            //             a = summforpay - oplsumm;
-            //             if(a < summa)
-            //             {
+            string dater;//= arrayday[1] + "." + arraymonth[1]+"."+arrayyear[1];
+            // paySomeSumm(dater,summa,1,date);
+            //double oplsumma = 0;
+            for (int i = 0; i < arrayoplsumms.Count; i++)
+            {
+                if (arrayoplsumms[i] < arraysumsforpay[i]) summa += arrayoplsumms[i];
+            }
+            for (int i = 0; i < arrayoplsumms.Count; i++)
+            {
+                dater = arrayday[i] + "." + arraymonth[i] + "." + arrayyear[i];
+                int count = 0;
+                if (arrayyear[i] < yy)
+                {
+                    count++;
+                    if (arraysumsforpay[i] == arrayoplsumms[i])
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if (((summa + arrayoplsumms[i]) > arraysumsforpay[i]))
+                        {
+                            summa -= arraysumsforpay[i];
+                            paySomeSumm(dater, arraysumsforpay[i], count, date);
+                            updateCredit(arraysumsforpay[i], count, date);
+                        }
+                        else
+                        {
+                            paySomeSumm(dater, summa, count, date);
+                            updateCredit(summa, count, date);
+                            break;
+                        }
+                    }
+                }
+                else if (arraymonth[i] < mm)
+                {
+                    count++;
+                    if (arrayoplsumms[i] == arraysumsforpay[i])
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                        {
+                            summa -= arraysumsforpay[i];
+                            paySomeSumm(dater, arraysumsforpay[i], count, date);
+                            updateCredit(arraysumsforpay[i], count, date);
+                        }
+                        else
+                        {
+                            paySomeSumm(dater, summa, count, date);
+                            updateCredit(summa, count, date);
+                            break;
+                        }
+                    }
+                }
+                else if (arrayday[i] < dd)
+                {
+                    count++;
+                    if (arraysumsforpay[i] == arrayoplsumms[i])
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                        {
+                            summa -= arraysumsforpay[i];
+                            paySomeSumm(dater, arraysumsforpay[i], count, date);
+                            updateCredit(arraysumsforpay[i], count, date);
+                        }
+                        else
+                        {
+                            paySomeSumm(dater, summa, count, date);
+                            updateCredit(summa, count, date);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if (arrayoplsumms[i] == arraysumsforpay[i])
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                        {
+                            summa -= arraysumsforpay[i];
+                            paySomeSumm(dater, arraysumsforpay[i], count, date);
+                            updateCredit(arraysumsforpay[i], count, date);
+                        }
+                        else
+                        {
+                            paySomeSumm(dater, summa, count, date);
+                            updateCredit(summa, count, date);
+                            break;
+                        }
+                    }
+                }
 
-            //             }
-            //         }
-            if(vsyasumma == summa)
-            {
-                SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{vsyasumma - summa}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
-                command1.ExecuteNonQuery();                
+                // if (arrayoplsumms[i] != arraysumsforpay[i])
+                // {
+                //     dater = arrayday[i] + "." + arraymonth[i] + "." + arrayyear[i];
+                //     paySomeSumm(dater, summa, 0, date);
+                //     break;
+                // }
+                // vsyasumma += arraysumsforpay[i];
+                // if (arrayoplsumms[i] < arraysumsforpay[i])
+                // {
+                //     oplsumma += arrayoplsumms[i];
+                // }
             }
-            else if(vsyasumma < summa)
+            // if(vsyasumma == summa && vsyasumma == oplsumma)
+            // {
+            //     SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{vsyasumma - summa}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
+            //     command1.ExecuteNonQuery();
+            // }
+            // else if(vsyasumma < summa)
+            // {
+            //     System.Console.WriteLine("Ваша сдача: "+(summa - vsyasumma));
+            //     SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{0}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
+            //     command1.ExecuteNonQuery();
+            // }
+        }
+        void updateCredit(double minost, int pros, string EndDate)
+        {
+            double Ostatok = 0;
+            int countPros = 0;
+            if (connection.State == ConnectionState.Closed)
+                connection.Open();
+            string comtext = $"select Ostatok, Pros from Credit where SerP = '{SerP}' and Status = 'Открыт'";
+            SqlCommand command = new SqlCommand(comtext, connection);
+            using (SqlDataReader reader = command.ExecuteReader())
             {
-                System.Console.WriteLine("Ваша сдача: "+(summa - vsyasumma));
-                SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{0}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
-                command1.ExecuteNonQuery();
+                while (reader.Read())
+                {
+                    countPros += int.Parse(reader.GetValue(1).ToString());
+                    Ostatok += double.Parse(reader.GetValue(0).ToString());
+                }
             }
+            countPros += pros;
+            if (Ostatok - minost > 0)
+            {
+                Ostatok -= minost;
+                comtext = $"update Credit set Ostatok = '{Ostatok}',Pros='{countPros}' where SerP = '{SerP}' and Status = 'Открыт'";
+                command = new SqlCommand(comtext, connection);
+                command.ExecuteNonQuery();
+            }
+            else
+            {
+                comtext = $"update Credit set Ostatok = '0', Pros = '{countPros}', Status = 'Закрыт', EndDate = '{EndDate}' where SerP ='{SerP}' and Status = 'Открыт'";
+                command = new SqlCommand(comtext, connection);
+                command.ExecuteNonQuery();
+                comtext = $"delete from Graphic where SerP = '{SerP}'";
+                command = new SqlCommand(comtext, connection);
+                command.ExecuteNonQuery();
+            }
+        }
+        void paySomeSumm(string date, double summaopl, int pros, string dateopl)
+        {
+            if (connection.State == ConnectionState.Closed)
+                connection.Open();
+            string comtext = $"update Graphic set PaySumm = '{Math.Round(summaopl, 0)}',PayDate = '{dateopl}',Pros = '{pros}' where DateForPay = '{date}' and SerP = '{SerP}'";
+            SqlCommand command = new SqlCommand(comtext, connection);
+            command.ExecuteNonQuery();
         }
     }
 }

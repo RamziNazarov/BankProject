@@ -59,6 +59,7 @@ namespace ProjectAlif
         }
         public int AddAdmin()
         {
+            Console.Clear();
             System.Console.Write("Введите логин: ");
             this.log = int.Parse(Console.ReadLine());
             System.Console.Write("Введите пароль: ");
