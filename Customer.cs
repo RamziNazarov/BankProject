@@ -83,15 +83,25 @@ namespace ProjectAlif
             {
                 com = $"insert into Customer([SerP],[UserLogin],[UserPasswod],[FirstName],[LastName],[Gender],[MaritalStatus],[Nation],[BirthDate]) values ('{this.SerP}',{this.log},'{this.pas}','{this.firstName}','{this.lastName}','{this.gender}','{this.maritalStatus}','{this.nation}','{this.birthDate}')";
                 SqlCommand command = new SqlCommand(com, connection);
-                return command.ExecuteNonQuery();
+                int a = command.ExecuteNonQuery();
+                Console.WriteLine("Вы успешно зарегистрировались.");
+                Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+                Console.ReadKey();
+                Console.Clear();
+                return a;
             }
             else
             {
+                Console.WriteLine("Клиент с таким логином или серией паспорта существует!");
+                Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+                Console.ReadKey();
+                Console.Clear();
                 return 0;
             }
         }
         public bool FindCustomer()
         {
+            Console.Clear();
             System.Console.Write("Введите логин: ");
             this.log = int.Parse(Console.ReadLine());
             System.Console.Write("Введите пароль: ");
@@ -117,10 +127,14 @@ namespace ProjectAlif
                     }
                 }
             }
+            System.Console.WriteLine("Неправильный логин или пароль!");
+            System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+            Console.ReadKey();
             return false;
         }
         public void ShowInfoWithSerp()
         {
+            Console.Clear();
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
             SqlCommand command = new SqlCommand("Select * from Customer where SerP = '" + SerP + "'", connection);
@@ -131,9 +145,12 @@ namespace ProjectAlif
                     System.Console.WriteLine($"Серия паспорат: {reader.GetValue(0).ToString()}\nЛогин: {reader.GetValue(1).ToString()}\nПароль: {reader.GetValue(2).ToString()}\nДата рожения: {reader.GetValue(3).ToString().Substring(0, 10)}\nПол: {reader.GetValue(4).ToString()}\nСемейное положение: {reader.GetValue(5).ToString()}\nГражданство: {reader.GetValue(6).ToString()}\nИмя: {reader.GetValue(7).ToString()}\nФамилия: {reader.GetValue(8).ToString()}");
                 }
             }
+            System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+            Console.ReadKey();
         }
         public void ShowGraphicWithSerP()
         {
+            Console.Clear();
             int a = 0;
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
@@ -160,9 +177,12 @@ namespace ProjectAlif
             {
                 System.Console.WriteLine("У вас нет открытых кредитов!");
             }
+            System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+            Console.ReadKey();
         }
         public void ShowCreditWithSerP()
         {
+            Console.Clear();
             int a = 0;
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
@@ -188,9 +208,12 @@ namespace ProjectAlif
             {
                 System.Console.WriteLine("У вас нет кредитной истории!");
             }
+            System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+            Console.ReadKey();
         }
         public void SendApp()
         {
+            Console.Clear();
             string comstr;
             System.Console.Write("Цель кредите:\n1. Бытовая техника\n2. Телефон\n3. Ремонт\n4. Прочее\nВыбор: ");
             string ai = Console.ReadLine();
@@ -212,6 +235,8 @@ namespace ProjectAlif
                     command.ExecuteNonQuery();
                 }
                 System.Console.WriteLine("Отказано");
+                System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+                Console.ReadKey();
             }
             else
             {
@@ -223,6 +248,8 @@ namespace ProjectAlif
                 AddGraphic();
                 AddCredit();
                 System.Console.WriteLine("Одобрено!");
+                System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+                Console.ReadKey();
             }
         }
         public void AddCredit()
@@ -250,6 +277,7 @@ namespace ProjectAlif
         }
         public void ShowApplicationWithSerP()
         {
+            Console.Clear();
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
             SqlCommand com = new SqlCommand("select LastName,FirstName,Aim,Salary,CreditSumm,Term,Status from Applications join Customer on Customer.SerP = Applications.SerP where Applications.SerP = '" + SerP + "'", connection);
@@ -267,17 +295,16 @@ namespace ProjectAlif
             {
                 System.Console.WriteLine("У вас нет запросов!");
             }
+            System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+            Console.ReadKey();
         }
         public void Pay()
         {
+            Console.Clear();
             System.Console.Write("Введите сумму: ");
             double summa = double.Parse(Console.ReadLine());
             System.Console.Write("Введите дату(дд.мм.гггг): ");
             string date = Console.ReadLine();
-            int dd = int.Parse(date.Substring(0, 2));
-            int mm = int.Parse(date.Substring(3, 2));
-            int yy = int.Parse(date.Substring(6, 4));
-            //double vsyasumma = 0;
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
             List<int> arraymonth = new List<int>();
@@ -297,9 +324,7 @@ namespace ProjectAlif
                     arrayoplsumms.Add(double.Parse(reader.GetValue(3).ToString()));
                 }
             }
-            string dater;//= arrayday[1] + "." + arraymonth[1]+"."+arrayyear[1];
-            // paySomeSumm(dater,summa,1,date);
-            //double oplsumma = 0;
+            string dater;
             for (int i = 0; i < arrayoplsumms.Count; i++)
             {
                 if (arrayoplsumms[i] < arraysumsforpay[i]) summa += arrayoplsumms[i];
@@ -308,121 +333,59 @@ namespace ProjectAlif
             {
                 dater = arrayday[i] + "." + arraymonth[i] + "." + arrayyear[i];
                 int count = 0;
-                if (arrayyear[i] < yy)
+                if (arrayyear[i] < int.Parse(date.Substring(6, 4)))
                 {
                     count++;
-                    if (arraysumsforpay[i] == arrayoplsumms[i])
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if (((summa + arrayoplsumms[i]) > arraysumsforpay[i]))
-                        {
-                            summa -= arraysumsforpay[i];
-                            paySomeSumm(dater, arraysumsforpay[i], count, date);
-                            updateCredit(arraysumsforpay[i], count, date);
-                        }
-                        else
-                        {
-                            paySomeSumm(dater, summa, count, date);
-                            updateCredit(summa, count, date);
-                            break;
-                        }
-                    }
+                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
+                    if(res == 0) continue;
+                    else if(res == 1) break;
                 }
-                else if (arraymonth[i] < mm)
+                else if (arraymonth[i] < int.Parse(date.Substring(3, 2)))
                 {
                     count++;
-                    if (arrayoplsumms[i] == arraysumsforpay[i])
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
-                        {
-                            summa -= arraysumsforpay[i];
-                            paySomeSumm(dater, arraysumsforpay[i], count, date);
-                            updateCredit(arraysumsforpay[i], count, date);
-                        }
-                        else
-                        {
-                            paySomeSumm(dater, summa, count, date);
-                            updateCredit(summa, count, date);
-                            break;
-                        }
-                    }
+                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
+                    if(res == 0) continue;
+                    else if(res == 1) break;
                 }
-                else if (arrayday[i] < dd)
+                else if (arrayday[i] < int.Parse(date.Substring(0, 2)))
                 {
                     count++;
-                    if (arraysumsforpay[i] == arrayoplsumms[i])
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
-                        {
-                            summa -= arraysumsforpay[i];
-                            paySomeSumm(dater, arraysumsforpay[i], count, date);
-                            updateCredit(arraysumsforpay[i], count, date);
-                        }
-                        else
-                        {
-                            paySomeSumm(dater, summa, count, date);
-                            updateCredit(summa, count, date);
-                            break;
-                        }
-                    }
+                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
+                    if(res == 0) continue;
+                    else if(res == 1) break;
                 }
                 else
                 {
-                    if (arrayoplsumms[i] == arraysumsforpay[i])
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
-                        {
-                            summa -= arraysumsforpay[i];
-                            paySomeSumm(dater, arraysumsforpay[i], count, date);
-                            updateCredit(arraysumsforpay[i], count, date);
-                        }
-                        else
-                        {
-                            paySomeSumm(dater, summa, count, date);
-                            updateCredit(summa, count, date);
-                            break;
-                        }
-                    }
+                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
+                    if(res == 0) continue;
+                    else if(res == 1) break;
                 }
-
-                // if (arrayoplsumms[i] != arraysumsforpay[i])
-                // {
-                //     dater = arrayday[i] + "." + arraymonth[i] + "." + arrayyear[i];
-                //     paySomeSumm(dater, summa, 0, date);
-                //     break;
-                // }
-                // vsyasumma += arraysumsforpay[i];
-                // if (arrayoplsumms[i] < arraysumsforpay[i])
-                // {
-                //     oplsumma += arrayoplsumms[i];
-                // }
             }
-            // if(vsyasumma == summa && vsyasumma == oplsumma)
-            // {
-            //     SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{vsyasumma - summa}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
-            //     command1.ExecuteNonQuery();
-            // }
-            // else if(vsyasumma < summa)
-            // {
-            //     System.Console.WriteLine("Ваша сдача: "+(summa - vsyasumma));
-            //     SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{0}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
-            //     command1.ExecuteNonQuery();
-            // }
+            Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+            Console.ReadKey();
+        }
+        int proveryalka(double a, double b,ref double summa, string dater, int count, string date)
+        {
+            if (a == b)
+            {
+                return 0;
+            }
+            else
+            {
+                if ((summa + a) > b && a < b)
+                {
+                    summa -= b;
+                    paySomeSumm(dater, b, count, date);
+                    updateCredit(b, count, date);
+                    return 2;
+                }
+                else
+                {
+                    paySomeSumm(dater, summa, count, date);
+                    updateCredit(summa, count, date);
+                    return 1;
+                }
+            }
         }
         void updateCredit(double minost, int pros, string EndDate)
         {
