@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -270,16 +271,29 @@ namespace ProjectAlif
             double vsyasumma = 0;
             if(connection.State == ConnectionState.Closed)
                 connection.Open();
+            List<int> arraymonth = new List<int>();
+            List<int> arrayyear = new List<int>();
+            List<int> arrayday = new List<int>();
+            List<double> arraysumsforpay = new List<double>();
+            List<double> arrayoplsumms = new List<double>();
             SqlCommand command = new SqlCommand($"select * from Graphic where SerP = '{SerP}'",connection);
             using(SqlDataReader reader = command.ExecuteReader())
             {
                 while(reader.Read())
                 {
-                    int month = int.Parse(reader.GetValue(2).ToString().Substring(3,2));
-                    int year = int.Parse(reader.GetValue(2).ToString().Substring(6,4));
-                    int day = int.Parse(reader.GetValue(2).ToString().Substring(0,2));
-                    double summforpay = double.Parse(reader.GetValue(1).ToString());
-                    vsyasumma+=summforpay;
+                    // int month = int.Parse(reader.GetValue(2).ToString().Substring(3,2));
+                    arraymonth.Add(int.Parse(reader.GetValue(2).ToString().Substring(3,2)));
+                    // int year
+                    arrayyear.Add(int.Parse(reader.GetValue(2).ToString().Substring(6,4)));
+                    // int day = 
+                    arrayday.Add(int.Parse(reader.GetValue(2).ToString().Substring(0,2)));
+                    // double summforpay = 
+                    arraysumsforpay.Add(double.Parse(reader.GetValue(1).ToString()));
+                    //vsyasumma+=summforpay;
+                    //double a =0;
+                    // double oplsumm = 
+                    arrayoplsumms.Add(double.Parse(reader.GetValue(3).ToString()));
+                    
                     // if(double.Parse(reader.GetValue(1).ToString()) < double.Parse(reader.GetValue(3).ToString()))
                     // {
                     //     string datefor = reader.GetValue(2).ToString().Substring(0,10);
@@ -297,10 +311,24 @@ namespace ProjectAlif
                     // }
                 }
             }
+            // if(oplsumm < summforpay)
+            //         {
+            //             a = summforpay - oplsumm;
+            //             if(a < summa)
+            //             {
+
+            //             }
+            //         }
             if(vsyasumma == summa)
             {
                 SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{vsyasumma - summa}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
                 command1.ExecuteNonQuery();                
+            }
+            else if(vsyasumma < summa)
+            {
+                System.Console.WriteLine("Ваша сдача: "+(summa - vsyasumma));
+                SqlCommand command1 = new SqlCommand($"update Credit set Status = 'Закрыт',Ostatok = '{0}', EndDate = '{date}' where SerP = '{SerP}'; delete from Graphic where SerP = '{SerP}'",connection);
+                command1.ExecuteNonQuery();
             }
         }
     }

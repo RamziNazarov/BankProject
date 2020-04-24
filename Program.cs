@@ -6,101 +6,120 @@ namespace ProjectAlif
     {
         static void Main(string[] args)
         {
-            System.Console.WriteLine(int.Parse(DateTime.Now.ToString().Substring(6, 4)));
             Customer customer;
             Admin admin;
-            string choise = "";
-            bool res = false;
-            int result = 0;
             System.Console.Write("1. Авторизация\n2. Вход\nВыбор: ");
-            choise = Console.ReadLine();
-            switch (choise)
+            switch (Console.ReadLine())
             {
 
                 case "1":
+                    regagain:
                     Console.Clear();
                     customer = new Customer();
-                    result = customer.AddCustomer();
-                    if (result >= 1)
+                    if (customer.AddCustomer() >= 1)
                     {
-                        System.Console.WriteLine("Welcome!");
+                        System.Console.WriteLine("Вы успешно зарегистрировались.");
+                        System.Console.WriteLine("Press any key to log in...");
+                        Console.ReadKey();
                         goto come;
                     }
                     else
                     {
-                        System.Console.WriteLine("eror");
+                        System.Console.WriteLine("Клиент с таким логином или серией паспорта существует!");
+                        System.Console.WriteLine("Press any key to reg again...");
+                        Console.ReadKey();
+                        goto regagain;
                     }
-                    break;
                 case "2":
                 come:
                     Console.Clear();
                     System.Console.Write("1. Войти как админ\n2. Войти как клиент\nВыбор: ");
-                    choise = Console.ReadLine();
-                    switch (choise)
+                    switch (Console.ReadLine())
                     {
                         case "1":
+                            secondchance:
                             Console.Clear();
-                            System.Console.WriteLine("Войти как админ");
                             admin = new Admin();
-                            res = admin.FindAdmin();
-                            if (res)
+                            if (admin.FindAdmin())
                             {
+                            adminmenu:
                                 Console.Clear();
-                                System.Console.WriteLine("1. Добавить админа: ");
-                                choise = Console.ReadLine();
-                                switch (choise)
+                                System.Console.WriteLine("1. Добавить админа\n2. Посмотреть все заявки\n3. Посмотреть заявки одного клиента\n4. Посмотреть график погашения всех клиентов\n5. Посмотреть график погашения одного клиента\n6. ");
+                                switch (Console.ReadLine())
                                 {
                                     case "1":
-                                        result = admin.AddAdmin();
-                                        if (result >= 1)
+                                        if (admin.AddAdmin() >= 1)
                                         {
-                                            System.Console.WriteLine("successfully");
+                                            Console.Clear();
+                                            System.Console.WriteLine("Админ успешно добавлен!");
+                                            System.Console.WriteLine("Press any key tot turn back...");
+                                            Console.ReadKey();
+                                            goto adminmenu;
                                         }
                                         else
                                         {
-                                            System.Console.WriteLine("eror");
+                                            Console.Clear();
+                                            System.Console.WriteLine("Ошбика, админ с таким логином сущесвует!");
+                                            System.Console.WriteLine("Press any key to turn back...");
+                                            Console.ReadKey();
+                                            goto adminmenu;
                                         }
-                                        break;
                                     case "2":
+                                        Console.Clear();
                                         admin.SelectAllApplications();
-                                        break;
+                                        System.Console.WriteLine("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto adminmenu;
                                     case "3":
-                                        admin.SelectAllApplicationsFromSerP("a 12345679");
-                                        break;
+                                        Console.Clear();
+                                        System.Console.Write("Введите серию паспорта или номер(логин): ");
+                                        admin.SelectAllApplications(Console.ReadLine());
+                                        System.Console.WriteLine("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto adminmenu;
+                                    case "4":
+                                        Console.Clear();
+                                        admin.SelectAllGraphic();
+                                        System.Console.WriteLine("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto adminmenu;
+                                    case "5":
+                                        Console.Clear();
+                                        System.Console.Write("Введите серию паспорта или номер(логин): ");
+                                        admin.SelectAllGraphic(Console.ReadLine());
+                                        System.Console.WriteLine("Press any key to turn back...");
+                                        Console.ReadKey();
+                                        goto adminmenu;
                                 }
                             }
                             else
                             {
-                                System.Console.WriteLine("eror");
+                                System.Console.WriteLine("Неправильный логин или пароль!");
+                                goto secondchance;
                             }
                             break;
                         case "2":
+                            chance:
                             Console.Clear();
                             customer = new Customer();
-                            res = customer.FindCustomer();
-                            if (res)
+                            if (customer.FindCustomer())
                             {
                             menu:
                                 Console.Clear();
                                 System.Console.WriteLine($"Доброе пожаловать {customer.firstName} {customer.lastName}!");
                                 System.Console.Write("1. Оставить заявку на кредит\n2. Посмотреть историю заявок\n3. Посмотреть данные\n4. Посмотреть кредитную историю\n5. Посмотреть график погашения\n6. Оплатить\nВыбор: ");
-                                choise = Console.ReadLine();
-                                switch (choise)
+                                switch (Console.ReadLine())
                                 {
                                     case "1":
                                         Console.Clear();
                                         customer.SendApp();
-                                        // Application application = new Application(customer);
-                                        // application.SendApp();
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
                                     case "2":
                                         Console.Clear();
                                         customer.ShowApplicationWithSerP();
-                                        // Application application1 = new Application(customer);
-                                        // application1.ShowApplicationWithSerP();
-                                        System.Console.Write("Press any key to turn back...");
+                                        Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
                                     case "3":
@@ -121,7 +140,7 @@ namespace ProjectAlif
                                         System.Console.Write("Press any key to turn back...");
                                         Console.ReadKey();
                                         goto menu;
-                                        case "6":
+                                    case "6":
                                         Console.Clear();
                                         customer.Pay();
                                         System.Console.Write("Press any key to turn back...");
@@ -131,9 +150,9 @@ namespace ProjectAlif
                             }
                             else
                             {
-                                System.Console.WriteLine("eror");
+                                System.Console.WriteLine("Неправильный логин или пароль!");
                             }
-                            break;
+                            goto chance;
                     }
                     break;
             }
