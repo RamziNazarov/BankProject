@@ -300,134 +300,358 @@ namespace ProjectAlif
         }
         public void Pay()
         {
-            Console.Clear();
-            System.Console.Write("Введите сумму: ");
-            double summa = double.Parse(Console.ReadLine());
-            System.Console.Write("Введите дату(дд.мм.гггг): ");
-            string date = Console.ReadLine();
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
-            List<int> arraymonth = new List<int>();
-            List<int> arrayyear = new List<int>();
-            List<int> arrayday = new List<int>();
-            List<double> arraysumsforpay = new List<double>();
-            List<double> arrayoplsumms = new List<double>();
-            SqlCommand command = new SqlCommand($"select * from Graphic where SerP = '{SerP}'", connection);
-            using (SqlDataReader reader = command.ExecuteReader())
+            using (SqlConnection connection = new SqlConnection(Constr.connectionString))
             {
-                while (reader.Read())
+                if (connection.State == ConnectionState.Closed)
+                    connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction();
+                Console.Clear();
+                System.Console.Write("Введите сумму: ");
+                double summa = double.Parse(Console.ReadLine());
+                System.Console.Write("Введите дату(дд.мм.гггг): ");
+                string date = Console.ReadLine();
+                SqlCommand command = connection.CreateCommand();
+                command.Transaction = transaction;
+                try
                 {
-                    arraymonth.Add(int.Parse(reader.GetValue(2).ToString().Substring(3, 2)));
-                    arrayyear.Add(int.Parse(reader.GetValue(2).ToString().Substring(6, 4)));
-                    arrayday.Add(int.Parse(reader.GetValue(2).ToString().Substring(0, 2)));
-                    arraysumsforpay.Add(double.Parse(reader.GetValue(1).ToString()));
-                    arrayoplsumms.Add(double.Parse(reader.GetValue(3).ToString()));
+                    List<int> arraymonth = new List<int>();
+                    List<int> arrayyear = new List<int>();
+                    List<int> arrayday = new List<int>();
+                    List<double> arraysumsforpay = new List<double>();
+                    List<double> arrayoplsumms = new List<double>();
+                    //SqlCommand command = new SqlCommand($"select * from Graphic where SerP = '{SerP}'", connection);
+                    command.CommandText = $"select * from Graphic where SerP = '{SerP}'";
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            arraymonth.Add(int.Parse(reader.GetValue(2).ToString().Substring(3, 2)));
+                            arrayyear.Add(int.Parse(reader.GetValue(2).ToString().Substring(6, 4)));
+                            arrayday.Add(int.Parse(reader.GetValue(2).ToString().Substring(0, 2)));
+                            arraysumsforpay.Add(double.Parse(reader.GetValue(1).ToString()));
+                            arrayoplsumms.Add(double.Parse(reader.GetValue(3).ToString()));
+                        }
+                    }
+                    double Ostatok = 0;
+                    int countPros = 0;
+                    command.CommandText = $"select Ostatok, Pros from Credit where SerP = '{SerP}' and Status = 'Открыт'";
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            countPros += int.Parse(reader.GetValue(1).ToString());
+                            Ostatok += double.Parse(reader.GetValue(0).ToString());
+                        }
+                    }
+                    // pros += countPros;
+                    // string comtext1 = "";
+                    // string comtext2 = "";
+                    string dater;
+                    for (int i = 0; i < arrayoplsumms.Count; i++)
+                    {
+                        if (arrayoplsumms[i] < arraysumsforpay[i]) summa += arrayoplsumms[i];
+                    }
+                    for (int i = 0; i < arrayoplsumms.Count; i++)
+                    {
+                        dater = arrayday[i] + "." + arraymonth[i] + "." + arrayyear[i];
+                        int count = 0;
+                        if (arrayyear[i] < int.Parse(date.Substring(6, 4)))
+                        {
+                            count++;
+                            if (arrayoplsumms[i] == arraysumsforpay[i])
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                
+                                if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                                {
+                                    summa -= arraysumsforpay[i];
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(arraysumsforpay[i], 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(summa, 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        else if (arraymonth[i] < int.Parse(date.Substring(3, 2)))
+                        {
+                            count++;
+                            if (arrayoplsumms[i] == arraysumsforpay[i])
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                
+                                if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                                {
+                                    summa -= arraysumsforpay[i];
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(arraysumsforpay[i], 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(summa, 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        else if (arrayday[i] < int.Parse(date.Substring(0, 2)))
+                        {
+                            count++;
+                            if (arrayoplsumms[i] == arraysumsforpay[i])
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                
+                                if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                                {
+                                    summa -= arraysumsforpay[i];
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(arraysumsforpay[i], 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(summa, 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (arrayoplsumms[i] == arraysumsforpay[i])
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                
+                                if ((summa + arrayoplsumms[i]) > arraysumsforpay[i] && arrayoplsumms[i] < arraysumsforpay[i])
+                                {
+                                    summa -= arraysumsforpay[i];
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(arraysumsforpay[i], 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                }
+                                else
+                                {
+                                    command.CommandText = $"update Graphic set PaySumm = '{Math.Round(summa, 0)}',PayDate = '{date}',Pros = '{count}' where DateForPay = '{dater}' and SerP = '{SerP}'";
+                                    command.ExecuteNonQuery();
+                                    count+= countPros;
+                                    if (Ostatok - summa > 0)
+                                    {
+                                        Ostatok -= summa;
+                                        command.CommandText = $"update Credit set Ostatok = '{Ostatok}',Pros='{count}' where SerP = '{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    else
+                                    {
+                                        command.CommandText = $"update Credit set Ostatok = '0', Pros = '{count}', Status = 'Закрыт', EndDate = '{date}' where SerP ='{SerP}' and Status = 'Открыт'";
+                                        command.ExecuteNonQuery();
+                                        command.CommandText = $"delete from Graphic where SerP = '{SerP}'";
+                                        command.ExecuteNonQuery();
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    transaction.Commit();
+                    System.Console.WriteLine("Оплата прошла успешно!");
+                    Console.Write("Нажмите на любую клавишу чтобы вернуться...");
+                    Console.ReadKey();
+                }
+                catch
+                {
+                    System.Console.WriteLine("Произошла ошибка во время платежа, просим вас ввести сумму и дату корректно.");
+                    System.Console.WriteLine("Нажмите на любую клавишу для возвращения в меню клиента...");
+                    Console.ReadKey();
+                    transaction.Rollback();
                 }
             }
-            string dater;
-            for (int i = 0; i < arrayoplsumms.Count; i++)
-            {
-                if (arrayoplsumms[i] < arraysumsforpay[i]) summa += arrayoplsumms[i];
-            }
-            for (int i = 0; i < arrayoplsumms.Count; i++)
-            {
-                dater = arrayday[i] + "." + arraymonth[i] + "." + arrayyear[i];
-                int count = 0;
-                if (arrayyear[i] < int.Parse(date.Substring(6, 4)))
-                {
-                    count++;
-                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
-                    if(res == 0) continue;
-                    else if(res == 1) break;
-                }
-                else if (arraymonth[i] < int.Parse(date.Substring(3, 2)))
-                {
-                    count++;
-                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
-                    if(res == 0) continue;
-                    else if(res == 1) break;
-                }
-                else if (arrayday[i] < int.Parse(date.Substring(0, 2)))
-                {
-                    count++;
-                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
-                    if(res == 0) continue;
-                    else if(res == 1) break;
-                }
-                else
-                {
-                    int res = proveryalka(arrayoplsumms[i],arraysumsforpay[i],ref summa,dater,count,date);
-                    if(res == 0) continue;
-                    else if(res == 1) break;
-                }
-            }
-            Console.Write("Нажмите на любую клавишу чтобы вернуться...");
-            Console.ReadKey();
         }
-        int proveryalka(double a, double b,ref double summa, string dater, int count, string date)
-        {
-            if (a == b)
-            {
-                return 0;
-            }
-            else
-            {
-                if ((summa + a) > b && a < b)
-                {
-                    summa -= b;
-                    paySomeSumm(dater, b, count, date);
-                    updateCredit(b, count, date);
-                    return 2;
-                }
-                else
-                {
-                    paySomeSumm(dater, summa, count, date);
-                    updateCredit(summa, count, date);
-                    return 1;
-                }
-            }
-        }
-        void updateCredit(double minost, int pros, string EndDate)
-        {
-            double Ostatok = 0;
-            int countPros = 0;
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
-            string comtext = $"select Ostatok, Pros from Credit where SerP = '{SerP}' and Status = 'Открыт'";
-            SqlCommand command = new SqlCommand(comtext, connection);
-            using (SqlDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    countPros += int.Parse(reader.GetValue(1).ToString());
-                    Ostatok += double.Parse(reader.GetValue(0).ToString());
-                }
-            }
-            countPros += pros;
-            if (Ostatok - minost > 0)
-            {
-                Ostatok -= minost;
-                comtext = $"update Credit set Ostatok = '{Ostatok}',Pros='{countPros}' where SerP = '{SerP}' and Status = 'Открыт'";
-                command = new SqlCommand(comtext, connection);
-                command.ExecuteNonQuery();
-            }
-            else
-            {
-                comtext = $"update Credit set Ostatok = '0', Pros = '{countPros}', Status = 'Закрыт', EndDate = '{EndDate}' where SerP ='{SerP}' and Status = 'Открыт'";
-                command = new SqlCommand(comtext, connection);
-                command.ExecuteNonQuery();
-                comtext = $"delete from Graphic where SerP = '{SerP}'";
-                command = new SqlCommand(comtext, connection);
-                command.ExecuteNonQuery();
-            }
-        }
-        void paySomeSumm(string date, double summaopl, int pros, string dateopl)
-        {
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
-            string comtext = $"update Graphic set PaySumm = '{Math.Round(summaopl, 0)}',PayDate = '{dateopl}',Pros = '{pros}' where DateForPay = '{date}' and SerP = '{SerP}'";
-            SqlCommand command = new SqlCommand(comtext, connection);
-            command.ExecuteNonQuery();
-        }
+        // int proveryalka(double a, double b, ref double summa, string dater, int count, string date, ref string comtext1, ref string comtext2, ref string comtext3)
+        // {
+        //     if (a == b)
+        //     {
+        //         comtext1 = "";
+        //         comtext2 = "";
+        //         return 0;
+        //     }
+        //     else
+        //     {
+        //         if ((summa + a) > b && a < b)
+        //         {
+        //             summa -= b;
+        //             paySomeSumm(dater, b, count, date, ref comtext3);
+        //             updateCredit(b, count, date, ref comtext1, ref comtext2);
+        //             return 2;
+        //         }
+        //         else
+        //         {
+        //             paySomeSumm(dater, summa, count, date, ref comtext3);
+        //             updateCredit(summa, count, date, ref comtext1, ref comtext2);
+        //             return 1;
+        //         }
+        //     }
+        // }
+
+        
+        // void updateCredit(double minost, ref int pros, string EndDate, ref string comtext1, ref string comtext2, out double Ostatok)
+        // {
+        //     Ostatok = 0;
+        //     int countPros = 0;
+        //     if (connection.State == ConnectionState.Closed)
+        //         connection.Open();
+        //     string comtext = $"select Ostatok, Pros from Credit where SerP = '{SerP}' and Status = 'Открыт'";
+        //     SqlCommand command = new SqlCommand(comtext, connection);
+        //     using (SqlDataReader reader = command.ExecuteReader())
+        //     {
+        //         while (reader.Read())
+        //         {
+        //             countPros += int.Parse(reader.GetValue(1).ToString());
+        //             Ostatok += double.Parse(reader.GetValue(0).ToString());
+        //         }
+        //     }
+        //     pros += countPros;
+        //     if (Ostatok - minost > 0)
+        //     {
+        //         Ostatok -= minost;
+        //         comtext = $"update Credit set Ostatok = '{Ostatok}',Pros='{pros}' where SerP = '{SerP}' and Status = 'Открыт'";
+        //         comtext1 = comtext;
+        //         // command = new SqlCommand(comtext, connection);
+        //         // int a = command.ExecuteNonQuery();
+        //         // return a;
+        //     }
+        //     else
+        //     {
+        //         // int a =0;
+        //         comtext = $"update Credit set Ostatok = '0', Pros = '{pros}', Status = 'Закрыт', EndDate = '{EndDate}' where SerP ='{SerP}' and Status = 'Открыт'";
+        //         comtext1 = comtext;
+        //         // command = new SqlCommand(comtext, connection);
+        //         // a = command.ExecuteNonQuery();
+        //         comtext = $"delete from Graphic where SerP = '{SerP}'";
+        //         comtext2 = comtext;
+        //         // command = new SqlCommand(comtext, connection);
+        //         // a+= command.ExecuteNonQuery();
+        //         // return a;
+        //     }
+        // }
+        // void paySomeSumm(string date, double summaopl, int pros, string dateopl, ref string comtext3)
+        // {
+        //     if (connection.State == ConnectionState.Closed)
+        //         connection.Open();
+        //     string comtext = $"update Graphic set PaySumm = '{Math.Round(summaopl, 0)}',PayDate = '{dateopl}',Pros = '{pros}' where DateForPay = '{date}' and SerP = '{SerP}'";
+        //     comtext3 = comtext;
+        //     // SqlCommand command = new SqlCommand(comtext, connection);
+        //     // command.ExecuteNonQuery();
+        // }
     }
 }
