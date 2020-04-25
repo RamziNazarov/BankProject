@@ -343,9 +343,6 @@ namespace ProjectAlif
                             Ostatok += double.Parse(reader.GetValue(0).ToString());
                         }
                     }
-                    // pros += countPros;
-                    // string comtext1 = "";
-                    // string comtext2 = "";
                     string dater;
                     for (int i = 0; i < arrayoplsumms.Count; i++)
                     {
@@ -577,81 +574,5 @@ namespace ProjectAlif
                 }
             }
         }
-        // int proveryalka(double a, double b, ref double summa, string dater, int count, string date, ref string comtext1, ref string comtext2, ref string comtext3)
-        // {
-        //     if (a == b)
-        //     {
-        //         comtext1 = "";
-        //         comtext2 = "";
-        //         return 0;
-        //     }
-        //     else
-        //     {
-        //         if ((summa + a) > b && a < b)
-        //         {
-        //             summa -= b;
-        //             paySomeSumm(dater, b, count, date, ref comtext3);
-        //             updateCredit(b, count, date, ref comtext1, ref comtext2);
-        //             return 2;
-        //         }
-        //         else
-        //         {
-        //             paySomeSumm(dater, summa, count, date, ref comtext3);
-        //             updateCredit(summa, count, date, ref comtext1, ref comtext2);
-        //             return 1;
-        //         }
-        //     }
-        // }
-
-        
-        // void updateCredit(double minost, ref int pros, string EndDate, ref string comtext1, ref string comtext2, out double Ostatok)
-        // {
-        //     Ostatok = 0;
-        //     int countPros = 0;
-        //     if (connection.State == ConnectionState.Closed)
-        //         connection.Open();
-        //     string comtext = $"select Ostatok, Pros from Credit where SerP = '{SerP}' and Status = 'Открыт'";
-        //     SqlCommand command = new SqlCommand(comtext, connection);
-        //     using (SqlDataReader reader = command.ExecuteReader())
-        //     {
-        //         while (reader.Read())
-        //         {
-        //             countPros += int.Parse(reader.GetValue(1).ToString());
-        //             Ostatok += double.Parse(reader.GetValue(0).ToString());
-        //         }
-        //     }
-        //     pros += countPros;
-        //     if (Ostatok - minost > 0)
-        //     {
-        //         Ostatok -= minost;
-        //         comtext = $"update Credit set Ostatok = '{Ostatok}',Pros='{pros}' where SerP = '{SerP}' and Status = 'Открыт'";
-        //         comtext1 = comtext;
-        //         // command = new SqlCommand(comtext, connection);
-        //         // int a = command.ExecuteNonQuery();
-        //         // return a;
-        //     }
-        //     else
-        //     {
-        //         // int a =0;
-        //         comtext = $"update Credit set Ostatok = '0', Pros = '{pros}', Status = 'Закрыт', EndDate = '{EndDate}' where SerP ='{SerP}' and Status = 'Открыт'";
-        //         comtext1 = comtext;
-        //         // command = new SqlCommand(comtext, connection);
-        //         // a = command.ExecuteNonQuery();
-        //         comtext = $"delete from Graphic where SerP = '{SerP}'";
-        //         comtext2 = comtext;
-        //         // command = new SqlCommand(comtext, connection);
-        //         // a+= command.ExecuteNonQuery();
-        //         // return a;
-        //     }
-        // }
-        // void paySomeSumm(string date, double summaopl, int pros, string dateopl, ref string comtext3)
-        // {
-        //     if (connection.State == ConnectionState.Closed)
-        //         connection.Open();
-        //     string comtext = $"update Graphic set PaySumm = '{Math.Round(summaopl, 0)}',PayDate = '{dateopl}',Pros = '{pros}' where DateForPay = '{date}' and SerP = '{SerP}'";
-        //     comtext3 = comtext;
-        //     // SqlCommand command = new SqlCommand(comtext, connection);
-        //     // command.ExecuteNonQuery();
-        // }
     }
 }
