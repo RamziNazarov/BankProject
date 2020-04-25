@@ -211,10 +211,26 @@ namespace ProjectAlif
             System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
             Console.ReadKey();
         }
-        public void SendApp()
+        public bool SendApp()
         {
             Console.Clear();
-            string comstr;
+            string comstr = $" select * from Credit where SerP= '{SerP}'";
+            using(SqlCommand command = new SqlCommand(comstr,connection))
+            {
+                using(SqlDataReader reader = command.ExecuteReader())
+                {
+                    while(reader.Read())
+                    {
+                        if(reader.GetValue(6).ToString() == "Открыт")
+                        {
+                            Console.WriteLine("У вас есть непогашенный кредит");
+                            System.Console.WriteLine("Нажмите любую клавишу чтобы вернуться в меню клиента...");
+                            Console.ReadKey();
+                            return false;
+                        }
+                    }
+                }
+            }
             System.Console.Write("Цель кредите:\n1. Бытовая техника\n2. Телефон\n3. Ремонт\n4. Прочее\nВыбор: ");
             string ai = Console.ReadLine();
             Aim = (ai == "1") ? "Бытовая техника" : (ai == "2") ? "Телефон" : (ai == "3") ? "Ремонт" : (ai == "4") ? "Прочее" : "Eror";
@@ -251,6 +267,7 @@ namespace ProjectAlif
                 System.Console.Write("Нажмите на любую клавишу чтобы вернуться...");
                 Console.ReadKey();
             }
+            return true;
         }
         public void AddCredit()
         {
@@ -573,6 +590,25 @@ namespace ProjectAlif
                     transaction.Rollback();
                 }
             }
+        }
+        public bool SearchOpenCredit()
+        {
+            Console.Clear();
+            if(connection.State == ConnectionState.Closed)
+                connection.Open();
+            SqlCommand command = new SqlCommand("select Status from Credit where SerP = '"+SerP+"'",connection);
+            using(SqlDataReader reader = command.ExecuteReader())
+            {
+                while(reader.Read())
+                {
+                    if(reader.GetValue(0).ToString() == "Открыт")
+                    return true;
+                }
+            }
+            System.Console.WriteLine("У вас нет открытых кредитов для оплаты!");
+            System.Console.WriteLine("Нажмите любую клавишу для перехода в меню клиента...");
+            Console.ReadKey();
+            return false;
         }
     }
 }

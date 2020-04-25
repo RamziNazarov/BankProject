@@ -14,18 +14,13 @@ namespace ProjectAlif
             int countofcredit = 0;
             if(connection.State == ConnectionState.Closed)
                 connection.Open();
-            using(SqlCommand command = new SqlCommand($"select * from Credit where SerP = '{customer.SerP}'",connection))
+            using(SqlCommand command = new SqlCommand($" select * from Credit where SerP= '{customer.SerP}'",connection))
             {
                 using(SqlDataReader reader = command.ExecuteReader())
                 {
                     while(reader.Read())
                     {
-                        if(reader.GetValue(6).ToString() == "Открыт")
-                        {
-                            Console.WriteLine("У вас есть непогашенный кредит");
-                            return false;
-                        }
-                        else
+                        if(reader.GetValue(6).ToString() != "Открыт")
                         {
                             countofcredit ++;
                         }

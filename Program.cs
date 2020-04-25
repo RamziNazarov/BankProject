@@ -63,7 +63,7 @@ namespace ProjectAlif
                                     case "3": customer.ShowInfoWithSerp(); goto menu;
                                     case "4": customer.ShowCreditWithSerP(); goto menu;
                                     case "5": customer.ShowGraphicWithSerP(); goto menu;
-                                    case "6": customer.Pay(); goto menu;
+                                    case "6": if(customer.SearchOpenCredit()) customer.Pay(); goto menu;
                                     case "7": goto come;
                                     default: goto menu;
                                 }
